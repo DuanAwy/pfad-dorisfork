@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.animation import FuncAnimation
 
 def koch_snowflake(order, scale=10):
     """
     Return two lists x, y of point coordinates of the Koch snowflake.
+
 
     Parameters
     ----------
@@ -20,9 +22,11 @@ def koch_snowflake(order, scale=10):
         else:
             ZR = 0.5 - 0.5j * np.sqrt(3) / 3
 
+
             p1 = _koch_snowflake_complex(order - 1)  # start points
             p2 = np.roll(p1, shift=-1)  # end points
             dp = p2 - p1  # connection vectors
+
 
             new_points = np.empty(len(p1) * 4, dtype=np.complex128)
             new_points[::4] = p1
@@ -31,13 +35,31 @@ def koch_snowflake(order, scale=10):
             new_points[3::4] = p1 + dp / 3 * 2
             return new_points
 
+
     points = _koch_snowflake_complex(order)
     x, y = points.real, points.imag
     return x, y
 
-x, y = koch_snowflake(order=7)
 
-plt.figure(figsize=(8, 8))
-plt.axis('equal')
-plt.fill(x, y)
+x, y = koch_snowflake(order=3)
+
+fig, ax = plt.subplots(figsize=(8, 8))
+ax.axis('equal')
+ax.fill(x, y)
+
+angle = 0
+def animate(i):
+    global angle
+    ax.clear()
+    ax.axis('equal')
+    ax.fill(x*np.cos(np.deg2rad(angle)) - y*np.sin(np.deg2rad(angle)),
+            x*np.sin(np.deg2rad(angle)) + y*np.cos(np.deg2rad(angle)))
+    angle += 1
+    if angle == 60:
+        angle = -60
+    elif angle == -60:
+        angle = 0
+
+ani = FuncAnimation(fig, animate, interval=50, repeat=True)
+
 plt.show()
